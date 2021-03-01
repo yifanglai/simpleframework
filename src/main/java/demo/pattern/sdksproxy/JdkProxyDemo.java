@@ -38,9 +38,14 @@ import java.lang.reflect.InvocationHandler;
  */
 public class JdkProxyDemo {
 	public static void main(String[] args) {
-		ToPayment toPayment = new ToBPayment();
+		test(new ToBPayment());
+	}
+
+	private static void test(ToPayment toPayment) {
 		InvocationHandler handler = new AlipayInvocationHandler(toPayment);
 		ToPayment toBProxy = JdkDynamicProxyUtil.newProxyInstance(toPayment,handler);
 		toBProxy.pay();
 	}
+
+
 }
