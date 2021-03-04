@@ -50,22 +50,52 @@ public class AspectWeaver {
 	public void doAop(){
 		//1.获取所有的切面类
 		Set<Class<?>> aspectSet = beanContainer.getClassesByAnnotation(Aspect.class);
-		//2.将切面类按照不同的织入目标进行切分
-		Map<Class<? extends Annotation>, List<AspectInfo>> categorizedMap = new HashMap <>();
-		if (ValidationUtil.isEmpty(aspectSet)){return;}
-		for (Class<?> aspectClass : aspectSet){
-			if (verifyAspect(aspectClass)){
-				categorizeAspect(categorizedMap,aspectClass);
-			}else{
-				throw new RuntimeException("切面不合法");
-			}
+//		//2.将切面类按照不同的织入目标进行切分
+//		Map<Class<? extends Annotation>, List<AspectInfo>> categorizedMap = new HashMap <>();
+//		if (ValidationUtil.isEmpty(aspectSet)){return;}
+//		for (Class<?> aspectClass : aspectSet){
+//			if (verifyAspect(aspectClass)){
+//				categorizeAspect(categorizedMap,aspectClass);
+//			}else{
+//				throw new RuntimeException("切面不合法");
+//			}
+//		}
+//		//3.按照不同的织入目标分别去按序织入Aspect的逻辑
+//		if (ValidationUtil.isEmpty(categorizedMap)){return;}
+//		for (Class<? extends Annotation> category:categorizedMap.keySet()){
+//			weaveByCategory(category,categorizedMap.get(category));
+//		}
+		if (ValidationUtil.isEmpty(aspectSet)){
+			return;
 		}
-		//3.按照不同的织入目标分别去按序织入Aspect的逻辑
-		if (ValidationUtil.isEmpty(categorizedMap)){return;}
-		for (Class<? extends Annotation> category:categorizedMap.keySet()){
-			weaveByCategory(category,categorizedMap.get(category));
+		//2.拼装AspectInfoList
+		List<AspectInfo> aspectInfoList = packAspectInfoList(aspectSet);
+		//3.遍历容器里的类
+		Set<Class<?>> classSet = beanContainer.getClasses();
+		for (Class<?> targetClass:classSet){
+			//排除AspectClass自身
+			if (targetClass.isAnnotationPresent(Aspect.class)){
+				continue;
+			}
+			//4.粗筛符合条件的Aspect
+			List<AspectInfo> roughMatchedAspectList = collectRoughMatchAspectListForSpecificClass(aspectInfoList);
+			//5.尝试进行Aspect的织入
+			wrapIfNecessary(roughMatchedAspectList,targetClass);
 		}
 	}
+
+	private List<AspectInfo> collectRoughMatchAspectListForSpecificClass(List<AspectInfo> aspectInfoList) {
+		return null;
+	}
+
+	private void wrapIfNecessary(List<AspectInfo> roughMatchedAspectList, Class<?> targetClass) {
+	}
+
+	private List<AspectInfo> packAspectInfoList(Set<Class<?>> aspectSet) {
+		List<AspectInfo> aspectInfoList=null;
+		return aspectInfoList;
+	}
+
 
 	private void weaveByCategory(Class<? extends Annotation> category, List<AspectInfo> aspectInfoList) {
 		//1.获取被代理类的集合
